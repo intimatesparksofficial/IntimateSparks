@@ -3803,15 +3803,15 @@ function setupConnection(conn) {
     
     rolesWithVisuals.forEach(matchData => {
         const btn = document.createElement('div');
-        // Flexbox layout: Left text, Right vertical 9:16 image
-        btn.className = 'relative w-full rounded-xl overflow-hidden border border-white/15 hover:border-pink-500/50 transition-all cursor-pointer group mb-3 shadow-lg bg-[#1a0508]/80 flex items-center justify-between p-3.5';
+        // Card ki height aur padding thodi bada di hai taaki bada image thumbnail easily fit ho jaye
+        btn.className = 'relative w-full rounded-2xl overflow-hidden border border-white/20 hover:border-pink-500/60 transition-all cursor-pointer group mb-4 shadow-xl bg-[#1a0508]/90 flex items-center justify-between p-4';
         
         btn.innerHTML = `
-            <div class="flex-1 pr-3 flex flex-col justify-center">
-                <h4 class="text-sm md:text-base font-bold text-white group-hover:text-pink-300 transition-colors leading-snug">${matchData.role}</h4>
-                <p class="text-[11px] text-white/70 italic mt-1 line-clamp-2 leading-tight">${matchData.hint}</p>
+            <div class="flex-1 pr-4 flex flex-col justify-center">
+                <h4 class="text-base md:text-lg font-bold text-white group-hover:text-pink-300 transition-colors leading-snug">${matchData.role}</h4>
+                <p class="text-xs text-white/70 italic mt-1 line-clamp-2 leading-relaxed">${matchData.hint}</p>
             </div>
-            <div class="flex-shrink-0 rounded-lg overflow-hidden border border-white/20 shadow-md bg-black" style="width: 50px; height: 89px;">
+            <div class="flex-shrink-0 rounded-xl overflow-hidden border border-white/25 shadow-lg bg-black" style="width: 65px; height: 115px;">
                 <img src="${matchData.img}" alt="${matchData.role}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
             </div>
         `;
