@@ -3797,25 +3797,23 @@ function setupConnection(conn) {
             }
         };
 
-      window.initStory = () => {
+    window.initStory = () => {
     const list = document.getElementById('roles-list'); 
     list.innerHTML = '';
     
     rolesWithVisuals.forEach(matchData => {
         const btn = document.createElement('div');
-        btn.className = 'relative w-full rounded-xl overflow-hidden border border-white/15 hover:border-pink-500/50 transition-all cursor-pointer group mb-3 shadow-lg';
+        // Flexbox layout: Left text, Right vertical 9:16 image
+        btn.className = 'relative w-full rounded-xl overflow-hidden border border-white/15 hover:border-pink-500/50 transition-all cursor-pointer group mb-3 shadow-lg bg-[#1a0508]/80 flex items-center justify-between p-3.5';
         
-        // Direct root path for images
-        btn.style.background = `linear-gradient(90deg, rgba(20, 5, 10, 0.95) 40%, rgba(20, 5, 10, 0.4) 100%), url('${matchData.img}')`;
-        btn.style.backgroundSize = 'cover';
-        btn.style.backgroundPosition = 'center';
-
         btn.innerHTML = `
-            <div class="p-4 flex flex-col justify-center min-h-[75px] relative z-10">
-                <h4 class="text-base font-bold text-white group-hover:text-pink-300 transition-colors">${matchData.role}</h4>
-                <p class="text-[11px] text-white/70 italic mt-0.5 line-clamp-1">${matchData.hint}</p>
+            <div class="flex-1 pr-3 flex flex-col justify-center">
+                <h4 class="text-sm md:text-base font-bold text-white group-hover:text-pink-300 transition-colors leading-snug">${matchData.role}</h4>
+                <p class="text-[11px] text-white/70 italic mt-1 line-clamp-2 leading-tight">${matchData.hint}</p>
             </div>
-            <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
+            <div class="flex-shrink-0 rounded-lg overflow-hidden border border-white/20 shadow-md bg-black" style="width: 50px; height: 89px;">
+                <img src="${matchData.img}" alt="${matchData.role}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            </div>
         `;
         
         btn.onclick = () => { window.state.story.role = matchData.role; window.storyNav(2); };
