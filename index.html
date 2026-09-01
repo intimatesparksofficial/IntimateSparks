@@ -3866,102 +3866,115 @@ window.setStoryActor = (a) => {
     if(btns[idx]) btns[idx].classList.add('bg-white/20', 'border-white');
 };
         // This function now checks for the API key first.
-        window.generateAIStory = async () => {
-             
-            // Set pending action
-            window.state.pendingAction = window.generateAIStory;
 
-            if (!window.state.geminiKey) {
+window.generateAIStory = async () => {
+    window.state.pendingAction = window.generateAIStory;
+
+    if (!window.state.geminiKey) {
+        window.openAPIKeyModal();
+        return;
+    }
+    
+    // UI Loading state
+    window.showScreen('story'); 
+    window.storyNav(3); 
+    document.getElementById('ai-loading').style.display = 'flex'; 
+    document.getElementById('story-content').innerHTML = ''; 
+    
+    const role = window.state.story.role;
+    document.getElementById('story-role-title').textContent = role;
+    const actor = window.state.story.actor; 
+    const target = actor === 'Him' ? 'Her' : 'Him';
+    const diff = window.state.story.diff;
+    const diffText = diff === 1 ? "Playful/Easy" : (diff === 2 ? "Hesitant/Hard" : "Forbidden/Extreme");
+    
+const prompt = `Write an intensely seductive, slow-burn adult roleplay story.
+
+    CRITICAL LANGUAGE RULE (70% Roman Hindi, 30% English):
+    • The ENTIRE story (both narration/actions AND dialogue) MUST be in Hinglish (Hindi written in English alphabets).
+    • Do NOT write the action/narration in pure English. 
+    • WRONG: He grabbed her waist and pulled her close. "Tum kya kar rahi ho?"
+    • RIGHT: Usne uski kamar ko kaskar pakda aur apne kareeb kheench liya. "Tum kya kar rahi ho? Are you crazy?"
+    • Mix natural English words like "feel", "control", "crazy", "damn", "hot", "tension" seamlessly into the Roman Hindi sentences.
+    • Speak like modern Indian adults. NO heavy poetic words (Avoid "jism", "sparsh", "sargoshi"). Use "body", "touch", "kareeb", "saans".
+
+    Goal & Tone:
+    • Focus heavily on physical tension, seductive actions, and steamy adult themes.
+    • Clearly describe the choreography: EXACTLY where the hands are moving (e.g., shirt ke andar haath daalna, neck pe kiss karna, baalon ko pakadna), physical reactions (heavy breathing, shivering).
+    • The progression should be extremely hot: hesitation -> intense eye contact -> pulling close -> whispering -> touching -> giving in.
+    • Format it like a detailed script where dialogues and physical touches intertwine naturally.
+
+    Dynamic Variables:
+    Roleplay Scenario: ${role}
+    Initiator: ${actor} (${actor === 'Him' ? 'Male' : 'Female'})
+    Target: ${target} (${target === 'Him' ? 'Male' : 'Female'})
+    Resistance Level: ${diffText}
+    
+    Length: 250–350 words.
+    Output: Only <p> HTML paragraphs. No headings.`;
+
+    const apiKey = window.state.geminiKey; 
+    // 🔥 YAHAN EXACT MODEL DAAL DIYA JO TERI LIST MEIN HAI 🔥
+    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + apiKey;
+
+    const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        safetySettings: [
+            { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_ONLY_HIGH" },
+            { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_ONLY_HIGH" }
+        ]
+    };
+
+    let text = null;
+    let exactError = "Unknown Error Occurred";
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST', 
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        const data = await response.json();
+
+        if (data.error) {
+            exactError = data.error.message;
+            if (exactError.includes("API key not valid")) {
+                window.showFeedback("Error: Invalid API Key. Please re-enter your key.", true);
+                localStorage.removeItem('geminiApiKey');
+                window.state.geminiKey = null;
+                document.getElementById('ai-loading').style.display = 'none';
                 window.openAPIKeyModal();
                 return;
             }
-            
-            // Proceed to the loading screen
-            window.showScreen('story'); window.storyNav(3); 
-            document.getElementById('ai-loading').style.display = 'flex'; document.getElementById('story-content').innerHTML = ''; 
-            const role = window.state.story.role;
-            document.getElementById('story-role-title').textContent = role;
-            const actor = window.state.story.actor; const target = actor === 'Him' ? 'Her' : 'Him';
-            const diff = window.state.story.diff;
-            const diffText = diff === 1 ? "Playful/Easy" : (diff === 2 ? "Hesitant/Hard" : "Forbidden/Extreme");
-            
-            const prompt = `Write an extended, intense, seductive, dialogue-focused roleplay story in Hinglish.
-            
-            Goal:
-            • Story must start slowly, with a smooth buildup.
-            • Increase length through layered dialogues, reactions, pauses.
-            • No romance — only mutual physical tension and attraction.
-            • Full consent maintained throughout.
-            • Slow-burn progression: hesitation → tension → persuasion → agreement.
-            • Do NOT rush to acceptance; let the dialogue create a gradual shift.
-            • No explicit or graphic physical details — only implied sensuality.
-            • 80–90% of the story should be dialogue and close-up tension.
+        } 
+        else if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+            text = data.candidates[0].content.parts[0].text;
+        } 
+        else if (data.candidates?.[0]?.finishReason === 'SAFETY') {
+            exactError = "Google AI Safety Filter blocked this. Try changing the role or resistance level.";
+        } 
+        else {
+            exactError = "Unexpected Response: " + JSON.stringify(data);
+        }
+    } catch (e) {
+        exactError = e.message;
+    }
 
-            Dynamic Variables:
-            Role: ${role}
-            Initiator: ${actor} (${actor === 'Him' ? 'Male' : 'Female'})
-            Target: ${target} (${target === 'Him' ? 'Male' : 'Female'})
-            Resistance Level: ${diffText}
+    document.getElementById('ai-loading').style.display = 'none';
+    
+    if (text) {
+        text = text.replace(/```html/g, '').replace(/```/g, '').trim();
+        window.state.currentAIStory = text;
+        document.getElementById('story-content').innerHTML = text;
+        window.state.pendingAction = null;
+    } else {
+         document.getElementById('story-content').innerHTML = '<p class="text-red-400 font-bold">API Error: ' + exactError + '</p>';
+    }
+};
 
-            Structure:
-            1. Slow Start — The Visit  
-            2. Gradual Pull-In — Invitation Inside  
-            3. Extended Push–Pull  
-            4. The Shift — Mutual Realization  
-            5. After Acceptance — Extended Tension  
-            
-            Length: 250–300+ words  
-            Tone: Slow, bold, seductive, highly dialogue-heavy, tension-driven.  
-            Output: Only <p> HTML paragraphs, no headings.`;
-
-            // Using the user-provided key
-            const apiKey = window.state.geminiKey; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-            };
-
-            // Implement simple retry logic with exponential backoff (max 3 retries)
-            let response, data, text;
-            for (let i = 0; i < 3; i++) {
-                try {
-                    response = await fetch(apiUrl, {
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    
-                    data = await response.json();
-
-                    if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        text = data.candidates[0].content.parts[0].text;
-                        break; // Success
-                    } else if (data.error && data.error.message.includes("API key not valid")) {
-                        window.showFeedback("Error: Invalid API Key. Please re-enter your key.", true);
-                        localStorage.removeItem('geminiApiKey');
-                        window.state.geminiKey = null;
-                        document.getElementById('ai-loading').style.display = 'none';
-                        window.openAPIKeyModal();
-                        return;
-                    }
-                } catch (e) {
-                    console.error(`Attempt ${i+1} failed:`, e);
-                    if (i < 2) {
-                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-                    }
-                }
-            }            
-            if (text) {
-                text = text.replace(/```html/g, '').replace(/```/g, '').trim();
-                window.state.currentAIStory = text;
-                document.getElementById('story-content').innerHTML = text;
-                window.state.pendingAction = null;
-            } else {
-                 document.getElementById('story-content').innerHTML = `<p class='text-red-400'>Error: Failed to generate story. Please check your API key or try again later.</p>`;
-            }
-            document.getElementById('ai-loading').style.display = 'none';
-        };
 
         // Replaced: No longer saves to Firebase, gives user feedback instead.
         window.saveCurrentStory = async () => { 
