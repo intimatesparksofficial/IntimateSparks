@@ -3815,7 +3815,7 @@ window.initStory = () => {
 
             const btn = document.createElement('button');
             
-            // Flexbox use kiya hai taaki text left me rahe aur image right me fix rahe
+            // Flexbox layout taaki text left me rahe aur choti image right me
             btn.className = 'w-full text-left rounded-xl border border-white/10 bg-[#15050d] hover:border-pink-500/50 hover:bg-white/5 transition-all group flex items-center justify-between p-3 mb-3 shadow-lg';
             
             btn.innerHTML = `
@@ -3827,7 +3827,6 @@ window.initStory = () => {
                 
                 <!-- Right Image Area (Chota Box, No Black Layer) -->
                 <div class="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 overflow-hidden rounded-lg shadow-md border border-white/10">
-                    <!-- Image ekdum clear aur bina kisi overlay ke aayegi -->
                     <img src="${roleImg}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Fantasy">
                 </div>
             `;
@@ -3847,6 +3846,24 @@ window.initStory = () => {
         console.error("Story Init Error:", err);
         list.innerHTML = `<p class="text-red-400 text-center text-sm p-4">Error loading fantasies. Please check console.</p>`;
     }
+};
+
+window.storyNav = (step) => {
+    ['1','2','3'].forEach(s => {
+        const stepEl = document.getElementById(`story-step-${s}`);
+        if(stepEl) stepEl.classList.add('hidden');
+    });
+    const targetStep = document.getElementById(`story-step-${step}`);
+    if(targetStep) targetStep.classList.remove('hidden');
+    if(step === 2 && !window.state.story.actor) window.setStoryActor('Him');
+};
+
+window.setStoryActor = (a) => {
+    window.state.story.actor = a;
+    document.querySelectorAll('.story-actor-btn').forEach(b => b.classList.remove('bg-white/20', 'border-white'));
+    const idx = a === 'Him' ? 0 : 1; 
+    const btns = document.querySelectorAll('.story-actor-btn');
+    if(btns[idx]) btns[idx].classList.add('bg-white/20', 'border-white');
 };
 
         // This function now checks for the API key first.
