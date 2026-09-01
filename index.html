@@ -3486,7 +3486,7 @@ function setupConnection(conn) {
             }
         };
 
-        const rolesData = [
+        const rolesWithVisuals = [
     { role: "Babysitter & Single Parent", hint: "When the kids are asleep, the adults come out to play.", img: "BABYSITTER.jpeg" },
     { role: "Best Friend's Partner", hint: "A secret glance across the room when nobody else is watching.", img: "BEST FRIEND'S PARTNER.jpeg" },
     { role: "Bodyguard & Celebrity", hint: "Escaping the paparazzi into a secure, locked hotel room.", img: "BODYGUARD AND CELEBRITY.jpeg" },
@@ -3762,28 +3762,40 @@ function setupConnection(conn) {
         };
 
         window.initStory = () => {
-             
-            const list = document.getElementById('roles-list'); list.innerHTML = '';
-            rolesData.forEach(r => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-3 rounded-lg border border-white/10 hover:bg-white/10 transition-colors text-sm font-semibold flex justify-between group';
-                btn.innerHTML = `<span>${r}</span><i data-lucide="chevron-right" class="w-4 h-4 opacity-0 group-hover:opacity-100"></i>`;
-                btn.onclick = () => { window.state.story.role = r; window.storyNav(2); };
-                list.appendChild(btn);
-            });
-            if(window.lucide) lucide.createIcons(); 
-            window.storyNav(1);
+    const list = document.getElementById('roles-list'); 
+    list.innerHTML = '';
+    
+    rolesData.forEach(r => {
+        // Match with visual data or fallback
+        const matchData = rolesWithVisuals.find(item => item.role === r) || { 
+            role: r, 
+            hint: "Late night secrets and unsaid tension...", 
+            img: "default.jpeg" 
         };
-        window.storyNav = (step) => {
-            ['1','2','3'].forEach(s => document.getElementById(`story-step-${s}`).classList.add('hidden'));
-            document.getElementById(`story-step-${step}`).classList.remove('hidden');
-            if(step === 2 && !window.state.story.actor) window.setStoryActor('Him');
-        };
-        window.setStoryActor = (a) => {
-            window.state.story.actor = a;
-            document.querySelectorAll('.story-actor-btn').forEach(b => b.classList.remove('bg-white/20', 'border-white'));
-            const idx = a === 'Him' ? 0 : 1; document.querySelectorAll('.story-actor-btn')[idx].classList.add('bg-white/20', 'border-white');
-        };
+
+        const btn = document.createElement('div');
+        btn.className = 'relative w-full rounded-xl overflow-hidden border border-white/15 hover:border-pink-500/50 transition-all cursor-pointer group mb-3 shadow-lg';
+        
+        // Background image fade effect
+        btn.style.background = `linear-gradient(90deg, rgba(20, 5, 10, 0.95) 40%, rgba(20, 5, 10, 0.4) 100%), url('${matchData.img}')`;
+        btn.style.backgroundSize = 'cover';
+        btn.style.backgroundPosition = 'center';
+
+        // FIX: Yahan ab matchData.role aur matchData.hint properly render hoga
+        btn.innerHTML = `
+            <div class="p-4 flex flex-col justify-center min-h-[75px] relative z-10">
+                <h4 class="text-base font-bold text-white group-hover:text-pink-300 transition-colors">${matchData.role}</h4>
+                <p class="text-[11px] text-white/70 italic mt-0.5 line-clamp-1">${matchData.hint}</p>
+            </div>
+            <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
+        `;
+        
+        btn.onclick = () => { window.state.story.role = r; window.storyNav(2); };
+        list.appendChild(btn);
+    });
+    if(window.lucide) lucide.createIcons(); 
+    window.storyNav(1);
+};
 
         // This function now checks for the API key first.
         window.generateAIStory = async () => {
