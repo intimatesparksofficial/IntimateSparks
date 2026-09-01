@@ -3490,7 +3490,7 @@ function setupConnection(conn) {
     { role: "Babysitter & Single Parent", hint: "When the kids are asleep, the adults come out to play.", img: "BABYSITTER.jpeg" },
     { role: "Best Friend's Partner", hint: "A secret glance across the room when nobody else is watching.", img: "BEST FRIEND'S PARTNER.jpeg" },
     { role: "Bodyguard & Celebrity", hint: "Escaping the paparazzi into a secure, locked hotel room.", img: "BODYGUARD AND CELEBRITY.jpeg" },
-    { role: "Boss & Secretary", hint: "Overtime work, closed office doors, and unspoken desires.", img: "BUSSBINESS.jpeg" }, // (Slight typo in your file name mapped correctly)
+    { role: "Boss & Secretary", hint: "Overtime work, closed office doors, and unspoken desires.", img: "BUSSBINESS.jpeg" },
     { role: "CEO & Intern", hint: "Late-night file reviews in a private executive suite.", img: "CEO AND INTERN.jpeg" },
     { role: "Cinema Strangers", hint: "Sharing the last row of a dark movie theater.", img: "CINEMA STRANGERS.jpeg" },
     { role: "Coworkers (Rivals)", hint: "Competing for the same promotion until the office empties out.", img: "COWORKERS.jpeg" },
@@ -3525,7 +3525,7 @@ function setupConnection(conn) {
     { role: "Police & Thief", hint: "A high-stakes interrogation room with just the two of them.", img: "POLICE AND THIEF.jpeg" },
     { role: "Professor & Student", hint: "After-hours tutoring in an empty campus library.", img: "PROFESSOR STUDNET.jpeg" },
     { role: "Rival Spies", hint: "Targeting the same enemy at a masquerade ball.", img: "RIVAL SPIES.jpeg" },
-    { role: "Roommates", hint: "Sharing an apartment means sharing more than rent.", ROOMMATES: "ROOMMATES.jpeg" }, // mapped
+    { role: "Roommates", hint: "Sharing an apartment means sharing more than rent.", img: "ROOMMATES.jpeg" },
     { role: "Soldier & Nurse", hint: "Treating a wound in a quiet medical tent.", img: "SOLDIER AND NURSE.jpeg" },
     { role: "Stranger at Bar", hint: "Eye contact across a dimly lit lounge.", img: "STRANGER AT BAR.jpeg" },
     { role: "Strict Boss & Late Employee", hint: "Being caught working late has unexpected rewards.", img: "STRICT BOSS.jpeg" },
@@ -3761,27 +3761,19 @@ function setupConnection(conn) {
             }
         };
 
-        window.initStory = () => {
+      window.initStory = () => {
     const list = document.getElementById('roles-list'); 
     list.innerHTML = '';
     
-    rolesData.forEach(r => {
-        // Match with visual data or fallback
-        const matchData = rolesWithVisuals.find(item => item.role === r) || { 
-            role: r, 
-            hint: "Late night secrets and unsaid tension...", 
-            img: "default.jpeg" 
-        };
-
+    rolesWithVisuals.forEach(matchData => {
         const btn = document.createElement('div');
         btn.className = 'relative w-full rounded-xl overflow-hidden border border-white/15 hover:border-pink-500/50 transition-all cursor-pointer group mb-3 shadow-lg';
         
-        // Background image fade effect
+        // Direct root path for images
         btn.style.background = `linear-gradient(90deg, rgba(20, 5, 10, 0.95) 40%, rgba(20, 5, 10, 0.4) 100%), url('${matchData.img}')`;
         btn.style.backgroundSize = 'cover';
         btn.style.backgroundPosition = 'center';
 
-        // FIX: Yahan ab matchData.role aur matchData.hint properly render hoga
         btn.innerHTML = `
             <div class="p-4 flex flex-col justify-center min-h-[75px] relative z-10">
                 <h4 class="text-base font-bold text-white group-hover:text-pink-300 transition-colors">${matchData.role}</h4>
@@ -3790,7 +3782,7 @@ function setupConnection(conn) {
             <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors pointer-events-none"></div>
         `;
         
-        btn.onclick = () => { window.state.story.role = r; window.storyNav(2); };
+        btn.onclick = () => { window.state.story.role = matchData.role; window.storyNav(2); };
         list.appendChild(btn);
     });
     if(window.lucide) lucide.createIcons(); 
