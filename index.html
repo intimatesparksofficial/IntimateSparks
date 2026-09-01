@@ -3815,19 +3815,18 @@ window.initStory = () => {
 
             const btn = document.createElement('button');
             
-            // Flexbox layout taaki text left me rahe aur choti image right me
-            btn.className = 'w-full text-left rounded-xl border border-white/10 bg-[#15050d] hover:border-pink-500/50 hover:bg-white/5 transition-all group flex items-center justify-between p-3 mb-3 shadow-lg';
+            btn.className = 'relative w-full text-left rounded-xl border border-white/10 bg-[#15050d] hover:border-pink-500/50 hover:shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all overflow-hidden group min-h-[105px] flex mb-3';
             
+            // Yahan properly backticks use hue hain bina kisi slash ke
             btn.innerHTML = `
-                <!-- Left Text Content -->
-                <div class="flex-1 pr-4">
-                    <h3 class="text-base md:text-lg font-bold text-white leading-tight mb-1">${roleName}</h3>
-                    <p class="text-[11px] md:text-xs text-white/60 leading-snug">${roleHint}</p>
+                <div class="relative z-10 w-[60%] p-4 flex flex-col justify-center pointer-events-none">
+                    <h3 class="text-base md:text-lg font-bold text-white leading-tight mb-1 drop-shadow-md">${roleName}</h3>
+                    <p class="text-[11px] md:text-xs text-white/60 leading-snug drop-shadow-sm font-medium">${roleHint}</p>
                 </div>
                 
-                <!-- Right Image Area (Chota Box, No Black Layer) -->
-                <div class="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 overflow-hidden rounded-lg shadow-md border border-white/10">
-                    <img src="${roleImg}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Fantasy">
+                <div class="absolute top-0 right-0 w-[45%] h-full z-0 pointer-events-none">
+                    <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-[#15050d] to-transparent z-10"></div>
+                    <img src="${roleImg}" onerror="this.style.opacity='0'" class="w-full h-full object-cover object-center group-hover:scale-110 transition-transform duration-500" alt="">
                 </div>
             `;
             
@@ -3844,7 +3843,8 @@ window.initStory = () => {
 
     } catch (err) {
         console.error("Story Init Error:", err);
-        list.innerHTML = `<p class="text-red-400 text-center text-sm p-4">Error loading fantasies. Please check console.</p>`;
+        // Error message ke liye normal single quotes use kiye hain taaki koi string issue na aaye
+        list.innerHTML = '<p class="text-red-400 text-center text-sm p-4">Error loading fantasies. Please check console.</p>';
     }
 };
 
@@ -3865,7 +3865,6 @@ window.setStoryActor = (a) => {
     const btns = document.querySelectorAll('.story-actor-btn');
     if(btns[idx]) btns[idx].classList.add('bg-white/20', 'border-white');
 };
-
         // This function now checks for the API key first.
         window.generateAIStory = async () => {
              
