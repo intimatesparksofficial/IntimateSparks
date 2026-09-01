@@ -3815,21 +3815,20 @@ window.initStory = () => {
 
             const btn = document.createElement('button');
             
-            btn.className = 'relative w-full text-left rounded-xl border border-white/10 bg-[#15050d] hover:border-pink-500/50 hover:shadow-[0_0_15px_rgba(236,72,153,0.2)] transition-all overflow-hidden group min-h-[100px] flex mb-3';
+            // Flexbox use kiya hai taaki text left me rahe aur image right me fix rahe
+            btn.className = 'w-full text-left rounded-xl border border-white/10 bg-[#15050d] hover:border-pink-500/50 hover:bg-white/5 transition-all group flex items-center justify-between p-3 mb-3 shadow-lg';
             
             btn.innerHTML = `
-                <!-- Left Text Content (Area thoda badha diya taaki text overlap na kare) -->
-                <div class="relative z-10 w-[65%] p-4 flex flex-col justify-center pointer-events-none">
-                    <h3 class="text-base md:text-lg font-bold text-white leading-tight mb-1 drop-shadow-lg">${roleName}</h3>
-                    <p class="text-[11px] md:text-xs text-white/60 leading-snug drop-shadow-md font-medium">${roleHint}</p>
+                <!-- Left Text Content -->
+                <div class="flex-1 pr-4">
+                    <h3 class="text-base md:text-lg font-bold text-white leading-tight mb-1">${roleName}</h3>
+                    <p class="text-[11px] md:text-xs text-white/60 leading-snug">${roleHint}</p>
                 </div>
                 
-                <!-- Right Image Area (Width 35% kar di hai aur black layer hata di) -->
-                <div class="absolute top-0 right-0 w-[35%] h-full z-0 pointer-events-none">
-                    <!-- Sirf hard edge ko chupane ke liye left side par ek patla sa blend -->
-                    <div class="absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-[#15050d] to-transparent z-10"></div>
-                    <!-- Opacity hata di hai taaki image original colors me aaye -->
-                    <img src="${roleImg}" class="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" alt="Fantasy">
+                <!-- Right Image Area (Chota Box, No Black Layer) -->
+                <div class="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 overflow-hidden rounded-lg shadow-md border border-white/10">
+                    <!-- Image ekdum clear aur bina kisi overlay ke aayegi -->
+                    <img src="${roleImg}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Fantasy">
                 </div>
             `;
             
@@ -3846,7 +3845,7 @@ window.initStory = () => {
 
     } catch (err) {
         console.error("Story Init Error:", err);
-        list.innerHTML = \`<p class="text-red-400 text-center text-sm p-4">Error loading fantasies. Please check console.</p>\`;
+        list.innerHTML = `<p class="text-red-400 text-center text-sm p-4">Error loading fantasies. Please check console.</p>`;
     }
 };
 
