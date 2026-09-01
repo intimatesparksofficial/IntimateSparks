@@ -3797,29 +3797,37 @@ function setupConnection(conn) {
             }
         };
 
-   window.initStory = () => {
-    const list = document.getElementById('roles-list'); 
-    list.innerHTML = '';
+  window.initStory = () => {
+    const list = document.getElementById('roles-list'); list.innerHTML = '';
     
-    rolesWithVisuals.forEach(matchData => {
-        const btn = document.createElement('div');
-        // Clean horizontal card: Left side text, Right side compact 9:16 vertical thumbnail
-        btn.className = 'relative w-full rounded-xl overflow-hidden border border-white/15 hover:border-pink-500/50 transition-all cursor-pointer group mb-3 shadow-lg bg-[#150406]/95 flex items-center justify-between p-3.5';
+    rolesData.forEach(r => {
+        const btn = document.createElement('button');
+        
+        // Premium Card Container Style
+        btn.className = 'relative w-full text-left rounded-xl border border-white/10 bg-black/40 hover:border-pink-500/50 hover:bg-white/5 transition-all overflow-hidden group min-h-[100px] flex mb-3';
         
         btn.innerHTML = `
-            <div class="flex-1 pr-3 flex flex-col justify-center">
-                <h4 class="text-sm md:text-base font-bold text-white group-hover:text-pink-300 transition-colors leading-snug">${matchData.role}</h4>
-                <p class="text-[11px] text-white/70 italic mt-1 line-clamp-2 leading-tight">${matchData.hint}</p>
+            <!-- Left Side: Text Area -->
+            <div class="relative z-10 w-2/3 p-4 flex flex-col justify-center pointer-events-none">
+                <h3 class="text-base md:text-lg font-bold text-white leading-tight mb-1 drop-shadow-lg">${r.role}</h3>
+                <p class="text-[11px] md:text-xs text-white/60 leading-snug drop-shadow-md font-medium">${r.hint}</p>
             </div>
-            <div class="flex-shrink-0 rounded-lg overflow-hidden border border-white/20 shadow-md bg-black relative" style="width: 44px; height: 78px;">
-                <img src="${matchData.img}" alt="${matchData.role}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none"></div>
+            
+            <!-- Right Side: Image with Fade Gradient -->
+            <div class="absolute top-0 right-0 w-[55%] h-full z-0 pointer-events-none">
+                <!-- Yeh gradient image ko left se background me fade karta hai -->
+                <div class="absolute inset-0 bg-gradient-to-r from-[#1a0505] via-black/60 to-transparent z-10"></div>
+                
+                <!-- Image zoom effect on hover -->
+                <img src="${r.img}" class="w-full h-full object-cover opacity-70 group-hover:scale-110 transition-transform duration-700" alt="Fantasy">
             </div>
         `;
         
-        btn.onclick = () => { window.state.story.role = matchData.role; window.storyNav(2); };
+        // Note: window.state.story.role ko r.role set karna zaroori hai (pehle sirf 'r' tha)
+        btn.onclick = () => { window.state.story.role = r.role; window.storyNav(2); };
         list.appendChild(btn);
     });
+    
     if(window.lucide) lucide.createIcons(); 
     window.storyNav(1);
 };
